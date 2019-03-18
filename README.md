@@ -25,7 +25,7 @@ their skills and talents and genius to the goal of entertaining us all.
 
 And...cocktail robotics has a history of triggering interesting innovations
 in unexpected areas...so dig in! Make a robot. It is fun. And perhaps, a little
-mess!
+messy!
  
 
 
