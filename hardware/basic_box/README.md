@@ -1,5 +1,8 @@
 # Basic Box
 
+
+![Hello Drinkbot: Basic Box](basic_box.png "Basic box")
+
 Laser cut from 6 mm (1/4") material. Use 24 M3-12mm screws and nuts to fasten 
 the case together.
 
