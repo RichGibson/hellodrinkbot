@@ -43,6 +43,10 @@ while 1:
 		i.run(Adafruit_MotorHAT.FORWARD);
 		time.sleep(t)
 		i.run(Adafruit_MotorHAT.RELEASE);
+		print ('Start motor: ', n)
+		i.run(Adafruit_MotorHAT.BACKWARD);
+		time.sleep(t)
+		i.run(Adafruit_MotorHAT.RELEASE);
 		n = n+1
 	print('all pumps off waiting...')
 	time.sleep(t)
