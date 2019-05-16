@@ -1,4 +1,4 @@
-# Basic Box
+# Shorty
 
 
 ![Hello Drinkbot: Basic Box](shorty.png "Shorty")
