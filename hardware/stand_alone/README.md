@@ -1,7 +1,7 @@
 # Stand Alone
 
 
-![Hello Drinkbot: Stand Alone Box](stand_alone.jpg "Stand Alone")
+![Hello Drinkbot: Stand Alone Box](stand_alone.png "Stand Alone")
 
 Laser cut from 6 mm (1/4") material. Use 24 M3-12mm screws and nuts to fasten 
 the case together.
