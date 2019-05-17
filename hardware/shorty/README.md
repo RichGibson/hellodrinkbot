@@ -1,7 +1,7 @@
 # Shorty
 
 
-![Hello Drinkbot: Basic Box](shorty.png "Shorty")
+![Hello Drinkbot: 'Shorty'](shorty.png "Shorty")
 
 A variant of the Stand alone version, but without the legs. 
 
