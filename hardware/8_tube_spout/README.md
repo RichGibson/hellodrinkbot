@@ -2,7 +2,7 @@
 
 
 ![Hello Drinkbot: 8 tube dispenser](8_tube.jpg "8 tube dispenser")
-
+![Hello Drinkbot: 8 tube dispenser installed](8_tube_installed.jpg "8 tube dispenser installed")
 
 Notes on spout design.
 
