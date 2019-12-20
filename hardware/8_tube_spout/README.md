@@ -1,3 +1,9 @@
+# 8 Spout Dispenser from Donald Bell
+
+
+![Hello Drinkbot: 8 tube dispenser](8_tube.jpg "8 tube dispenser")
+
+
 Notes on spout design.
 
 This 8-tube design was modified by Donald Bell from a design shared on Thingiverse by dwmartin805 that accommodates 15 tubes. https://www.thingiverse.com/thing:500062
