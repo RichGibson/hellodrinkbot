@@ -14,5 +14,5 @@
 |standoffs
 |wire
 |crimp connectors||||or you can solder the motors
-|
+||||||
 |Total|||137.27|A work in progress. Suggestions welcome
