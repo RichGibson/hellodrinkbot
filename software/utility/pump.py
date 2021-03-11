@@ -12,13 +12,29 @@ if len(sys.argv) < 3 :
     print "Runs motor # <motor> for <time in seconds> and then stops. "
     sys.exit(2)
 
-m = int(sys.argv[1])
-t = int(sys.argv[2])
+# 3 and 4 and 7 and 8 are reversed. I don't understand that.
 
-m2 = (m+1)/2
+pump=sys.argv[1]
+timecnt=sys.argv[2]
+
+m = int(pump)
+t = int(timecnt)
+
+mh1 = Adafruit_MotorHAT(addr=0x60)
+mh2 = Adafruit_MotorHAT(addr=0x61)
+if m>8:
+    m=m-8
+    m2 = (m+1)/2
+    myMotor=mh1.getMotor(m2)
+else:
+    m2 = (m+1)/2
+    mh = Adafruit_MotorHAT(addr=0x60)
+    myMotor=mh2.getMotor(m2)
+
+
 
 # create a default object, no changes to I2C address or frequency
-mh = Adafruit_MotorHAT(addr=0x60)
+
 
 
 myMotor=mh.getMotor(m2)

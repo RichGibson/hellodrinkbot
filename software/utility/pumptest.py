@@ -4,6 +4,7 @@ from Adafruit_MotorHAT import Adafruit_MotorHAT #, Adafruit_DCMotor
 import time
 import atexit
 import sys
+import pdb
 
 # python ./pumptest.py  <time in seconds>
 
@@ -38,12 +39,14 @@ for i in range(1,5):
 
 while 1:
 	n = 1
+        print(n)
 	for i in m[1:]:
-		print ('Start motor: ', n)
+		print ('Start motor: ', n, ' Forward')
 		i.run(Adafruit_MotorHAT.FORWARD);
 		time.sleep(t)
 		i.run(Adafruit_MotorHAT.RELEASE);
-		print ('Start motor: ', n)
+		print ('Start motor: ', n, ' Backward')
+                print()
 		i.run(Adafruit_MotorHAT.BACKWARD);
 		time.sleep(t)
 		i.run(Adafruit_MotorHAT.RELEASE);
