@@ -3,6 +3,8 @@
 
 ![Hello Drinkbot: 'Shorty'](shorty.png "Shorty")
 
+![Hello Drinkbot: 'Shorty layout'](shorty_layout.png "Shorty")
+
 A variant of the Stand alone version, but without the legs. 
 
 Laser cut from 6 mm (1/4") material. Use 4 M3-12mm screws and nuts to fasten 
