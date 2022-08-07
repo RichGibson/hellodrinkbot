@@ -15,11 +15,16 @@ try:
     import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
 
     GPIO.setwarnings(False) # Ignore warning for now
-    GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+    #GPIO.setmode(GPIO.BOARD) 
+    GPIO.setmode(GPIO.BCM)
+    #GPIO.setup(13, GPIO.IN)
+    #GPIO.setup(19, GPIO.IN)
+
 
     # Set pins 10 and 12 to be an input pin and set initial value to be pulled low (off)
-    GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
-    GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    #GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 
 except:
     print('Raspberry pi not responding, continuing in emulation mode')
@@ -59,13 +64,17 @@ def dispense(player):
         print('\tdispense a drink player=%i drink_counter=%i bad=%i ' % (i,drink_counter, bad), end='')
         if drink_counter==bad:
             print('\tYou are not going into space today.')
+            time.sleep(1)
             # serve the icky drink
             # reset drink_counter and bad. Or should I? One bad out of six shots
-            #drink_counter=0
-            #bad=0
+            drink_counter=0
+            bad=0
         else:
             # serve a fine shot
+            time.sleep(1)
             print('\tYou get to go to space. Congratulations')
+
+    print('service complete\n')
 
 # We don't know the state of the drink counter or of anything.
 # you push the button and 1 or 2 shots are poured.
@@ -87,7 +96,9 @@ while True: # Run forever
 
 
     else:
-        if GPIO.input(10) == GPIO.HIGH:
-            one_player()
-        if GPIO.input(12) == GPIO.HIGH:
-            two_player()
+        if GPIO.input(13) == GPIO.LOW:
+            print('1 button 1 pushed ')
+            dispense(1)
+        if GPIO.input(19) == GPIO.LOW:
+            print('button 2 pushed')
+            dispense(2)
