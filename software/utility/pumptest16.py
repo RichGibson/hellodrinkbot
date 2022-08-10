@@ -3,6 +3,7 @@
 # Modified to use the new MotorKit, which also requires python3
 
 from adafruit_motorkit import MotorKit
+#from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 
 import time
 import atexit
@@ -16,16 +17,24 @@ if len(sys.argv) < 2 :
     print ("Runs each motor for <time> seconds, and then repeats ")
     sys.exit(2)
 
-t = int(sys.argv[1])
+t = float(sys.argv[1])
+#t = int(sys.argv[1])
 
 print( "run motors 1,2,3,4 for %i seconds" % (t))
 
-
+# wait is motor hat or motor kit the new one?
 # create a default object, no changes to I2C address or frequency
 #mh1 = Adafruit_MotorHAT(addr=0x60)
 #mh2 = Adafruit_MotorHAT(addr=0x61)
+
 mh1 = MotorKit()
-mh2 = MotorKit(address=0x61)
+onehat = False
+try:
+    mh2 = MotorKit(address=0x61)
+    onehat=True
+except:
+    onehat=False
+
 
 # recommended for auto-disabling motors on shutdown!
 def turnOffMotors():
@@ -33,10 +42,13 @@ def turnOffMotors():
     mh1.motor2.throttle = None
     mh1.motor3.throttle = None
     mh1.motor4.throttle = None
-    mh2.motor1.throttle = None
-    mh2.motor2.throttle = None
-    mh2.motor3.throttle = None
-    mh2.motor4.throttle = None
+    try:
+        mh2.motor1.throttle = None
+        mh2.motor2.throttle = None
+        mh2.motor3.throttle = None
+        mh2.motor4.throttle = None
+    except:
+        pass
 
 atexit.register(turnOffMotors)
 
@@ -55,10 +67,13 @@ m.append(mh1.motor1)
 m.append(mh1.motor2)
 m.append(mh1.motor3)
 m.append(mh1.motor4)
-m.append(mh2.motor1)
-m.append(mh2.motor2)
-m.append(mh2.motor3)
-m.append(mh2.motor4)
+try:
+    m.append(mh2.motor1)
+    m.append(mh2.motor2)
+    m.append(mh2.motor3)
+    m.append(mh2.motor4)
+except:
+    pass
 
 while 1:
     n = 1
