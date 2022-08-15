@@ -9,12 +9,14 @@ try:
     GPIO.setwarnings(True) # 
     GPIO.setmode(GPIO.BCM)
 
-    # Set pins 13 and 19 to be an input pin and set initial value to be pulled low (off)
-    GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    left=12
+    right=6
+    # Set pins left and right to be an input pin and set initial value to be pulled low (off)
+    GPIO.setup(left, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    GPIO.setup(right, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 
-    GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    GPIO.setup(6, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    GPIO.setup(left, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    GPIO.setup(right, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 
 except:
     print('Raspberry pi not responding, continuing in emulation mode')
@@ -22,7 +24,7 @@ except:
 
 print("Starting loop. Press a button")
 while True: # Run forever
-    if GPIO.input(12) == GPIO.LOW:
+    if GPIO.input(left) == GPIO.LOW:
         print(' button 1 pushed ')
-    if GPIO.input(6) == GPIO.LOW:
+    if GPIO.input(right) == GPIO.LOW:
         print('button 2 pushed')
