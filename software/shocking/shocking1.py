@@ -15,7 +15,7 @@ emulation=0
 max_drink_counter=6 # one bad drink in each group of six
 bad = 0
 drink_counter = 0
-
+# not sure what I am doing wrong
 
 mh1 = MotorKit()
 
