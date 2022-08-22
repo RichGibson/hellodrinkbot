@@ -1,6 +1,7 @@
 # Test buttons 
 
 import sys
+import pdb
 import time
 
 
@@ -25,7 +26,7 @@ except:
 
 print("Starting loop. Press a button")
 while True: # Run forever
-    t=time.now()
+    t=time.time()
     if GPIO.input(12) == GPIO.LOW:
         print(' button 1 pushed ', t)
     if GPIO.input(6) == GPIO.LOW:
