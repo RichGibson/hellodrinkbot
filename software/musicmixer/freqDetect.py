@@ -1,5 +1,23 @@
-#THIS CODE IS HEAVILY BASED ON: 
+# I (Rich Gibson/hellodrinkbot) based my code on:
+# https://github.com/katrinamo/RPiPitch
+# I ripped out all of the parts I didn't need, and updated it to run under python3
+# And that code was: HEAVILY BASED ON: 
 # https://benchodroff.com/2017/02/18/using-a-raspberry-pi-with-a-microphone-to-hear-an-audio-alarm-using-fft-in-python/
+
+"""
+8/21/2022
+I can reasonably recognize nine notes. I only need eight. So what next?
+
+- set bartendro ingredients appropriately.
+- set shot size to something small
+- use shots API
+
+
+todo: F has stopped working. Not sure why.
+
+"""
+import urllib.request
+
 #/usr/bin/env python
 import pyaudio
 from numpy import zeros,linspace,short,fromstring,frombuffer,hstack,transpose,log2, log
@@ -24,7 +42,42 @@ frequencyoutput=True
 #E-F, G-A are solid. Lowest G is good.
 
 # it is mod 12, so 12 and 0 shouldn't both appear. But they do. Oh well.
-notes = {0:'A',1:'G#/Ab',2:'G',3:'F#/Db',4:'F',5:'E',6:'F#/Db',7:'D',8:'C#/Db',9:'C-probably',10:'B',11:'A#/Bb',  12:'A'}
+notes = {0:{'note':'A','api':'1'},
+1:{'note':'G#/Ab','api':''},
+2:{'note':'G','api':'2'},
+3:{'note':'F#/Db','api':''},
+4:{'note':'F','api':'3'},
+5:{'note':'E','api':'4'},
+6:{'note':'F#/Db','api':''},
+7:{'note':'D','api':'5'},
+8:{'note':'C#/Db','api':''},
+9:{'note':'C','api':'6'},
+10:{'note':'B','api':'7'},
+11:{'note':'A#/Bb',  'api':'8'},
+12:{'note':'A','api':'1'} }
+"""
+
+D - 1172, has some G - 3164 overtones
+E - 1336
+F
+G
+A
+B
+C
+
+next octave - identify as proper notes
+D
+E
+F
+G
+A - 3539
+
+So...seven notes plus these seem to work
+G#/Ab works
+Bb works
+
+Some others bars on the top row work, but we only need eight pumps.
+"""
 
 
 
@@ -59,9 +112,11 @@ _stream = pa.open(format=pyaudio.paInt16,
 
 print("Detecting Frequencies. Press CTRL-C to quit.")
 lastfreq=0
+lastintensity=0
 #notes =
 while True:
     while _stream.get_read_available()< NUM_SAMPLES: sleep(0.01)
+    # this sometimes generates input overflowed. So maybe just wrap it.
     audio_data  = frombuffer(_stream.read(
          _stream.get_read_available()), dtype=short)[-NUM_SAMPLES:]
     
@@ -73,6 +128,7 @@ while True:
     # it perhaps was fft, but now you want fft.fft
     # and / on integers was floor division, but in python 3 it is not. // is floor division
     intensity = abs(w*fft.fft(normalized_data))[:NUM_SAMPLES//2]
+    maxintensity=max(intensity)
     if max(intensity) < 1.5 or max(intensity)>10:
         continue
 
@@ -92,113 +148,32 @@ while True:
             if thefreq > MIN_FREQUENCY and thefreq < MAX_FREQUENCY:
                     adjfreq = thefreq
             if adjfreq != -9999:
-                if not (thefreq >= lastfreq-(lastfreq*.03) and thefreq <= lastfreq+(lastfreq*0.03)):
+                # todo: this eliminates duplicates, but I want to allow repeated strikes on the 
+                # same note. But not as 'keybounces' Maybe a little delay.
+                # if you are the same note, and within a given time then ignore, otherwise allow the duplicate.
+                # or be more clever?
+                # ignore when intensity is less than last intensity. 
+
+                maxintensity=max(intensity)
+                if not (thefreq >= lastfreq-(lastfreq*.03) and thefreq <= lastfreq+(lastfreq*0.03) and maxintensity<lastintensity):
                     #print('adjfreq %f min intensity: %f max intensity %f' % (adjfreq,min(intensity), max(intensity)))
                     adj = 1200 *log2(RELATIVE_FREQ/adjfreq)/100
                     adj = round(adj % 12)
-                    print("%s - %f - %f  intensity: %f" % (notes[adj], adj, adjfreq, max(intensity))) #'adjfreq %f min intensity: %f max intensity %f' % (adjfreq,min(intensity), max(intensity)))
+                    apicall=''
+                    if len(notes[adj]['api']) > 0:
+                        apicall='/ws/shots/%s' % notes[adj]['api']
+                    else:
+                        pass
+
+                    print("%s - %f - %f  intensity: %f api call: %s" % (notes[adj]['note'], adj, adjfreq, maxintensity, apicall)) 
+                    #'adjfreq %f min intensity: %f max intensity %f' % (adjfreq,min(intensity), max(intensity)))
+
+                    with urllib.request.urlopen('http://192.168.1.196:8080/%s' % apicall) as response:
+                       html = response.read()
                     lastfreq=adjfreq
                 else:
                     #print('.', end='')
                     pass
+    lastintensity=maxintensity
 
-    continue
 
-          #adjfreq = 140    
-    #print("Candidate Freq:  ", candidate_freq, which )
-    #sys.stdout.write("Frequency: %d  \r" % (adjfreq))
-    #sys.stdout.flush()
-    #cents conversion
-    if (adjfreq != -9999):
-        print( "RAW FREQ:", adjfreq)
-        adjfreq = 1200 *log2(RELATIVE_FREQ/adjfreq)/100
-        adjfreq = adjfreq % 12
-        print(adjfreq)
-
-        #Case statements
-        if abs(adjfreq - Note_E4 ) < 1:
-            
-            #In Tune E
-            if abs(adjfreq - Note_E4) < 0.1  :
-                print("You played an E!")
-            #Sharp E
-            elif (adjfreq - Note_E4) <  0  :
-                print("You are sharp E!")
-            #Flat E
-            elif (adjfreq - Note_E4) > 0  :
-                print("You are flat E!")
-        elif abs(adjfreq - Note_E ) < 1:
-                
-            #In Tune E
-            if abs(adjfreq - Note_E) < 0.1  :
-                print("You played an E2!")
-            #Sharp E
-            elif (adjfreq - Note_E) < 0  :
-                print("You are sharp E2!")
-            #Flat E
-            elif (adjfreq - Note_E) > 0  :
-                print("You are flat E2!")
-        elif abs(adjfreq - Note_B ) < 1:
-            
-            #In Tune B
-            if abs(adjfreq - Note_B) < 0.1  :
-                print("You played a B!")
-            #Sharp B
-            elif (adjfreq - Note_B) < 0  :
-                print("You are sharp (B)!")
-            #Flat B
-            elif (adjfreq - Note_B)  >0  :
-                print("You are flat (B)!")
-        elif abs(adjfreq - Note_G ) < 1:
-            
-            #In Tune g
-            if abs(adjfreq - Note_G) < 0.1  :
-                print("You played a G!")
-            #Sharp G
-            elif (adjfreq - Note_G) < 0  :
-                print("You are sharp (G)!")
-            #Flat G
-            elif (adjfreq - Note_G) > 0  :
-                print("You are flat (G)!")
-        
-        elif abs(adjfreq - Note_D ) < 1:
-    
-            
-            #In Tune D
-            if abs(adjfreq - Note_D) < 0.1  :
-                print("You played a D!")
-            #Sharp D
-            elif (adjfreq - Note_D) < 0  :
-                print("You are sharp (D)!")
-            #Flat D
-            elif (adjfreq - Note_D) > 0  :
-                print("You are flat (D)!")
-        elif abs(adjfreq - Note_A ) < 1:
-            
-            #In tune A
-            if abs(adjfreq - Note_A) < 0.2  :
-                print("You played an A!")
-            #Sharp A
-            elif (adjfreq - Note_A) < 0  :
-                print("You are sharp A!")
-            #Flat A
-            elif (adjfreq - Note_A)  > 0  :
-                print("You are flat A!")
-        elif abs(adjfreq - 12 ) < 1:
-            
-            #In tune A
-            if abs(adjfreq - 12) < 0.2  :
-                print("You played an A!")
-            #Sharp A
-            elif (adjfreq - 12) < 0  :
-                print("You are sharp A!")
-            #Flat A
-            elif (adjfreq - 12)  > 0  :
-                print("You are flat A!")
-      #all off
-    else:
-        pass
-    #sys.stdout.write("Cent: %s  \r" % adjfreq)
-    #sys.stdout.flush()
-        
-    sleep(0.01)
