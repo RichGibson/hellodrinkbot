@@ -42,6 +42,7 @@ frequencyoutput=True
 #E-F, G-A are solid. Lowest G is good.
 
 # it is mod 12, so 12 and 0 shouldn't both appear. But they do. Oh well.
+# 'api' should be a booze_id, not a pump id
 notes = {0:{'note':'A','api':'1'},
 1:{'note':'G#/Ab','api':''},
 2:{'note':'G','api':'2'},
@@ -115,10 +116,24 @@ lastfreq=0
 lastintensity=0
 #notes =
 while True:
-    while _stream.get_read_available()< NUM_SAMPLES: sleep(0.01)
-    # this sometimes generates input overflowed. So maybe just wrap it.
+    # wait until we have  NUM_SAMPLES in the stream
+    #print('where is the input overflow?')
+    while _stream.get_read_available()< NUM_SAMPLES: 
+        sleep(0.01)
+
+    #print('_stream loaded, now read')
     audio_data  = frombuffer(_stream.read(
-         _stream.get_read_available()), dtype=short)[-NUM_SAMPLES:]
+        _stream.get_read_available(), exception_on_overflow=False), dtype=short)[-NUM_SAMPLES:]
+
+    #try:
+        #while _stream.get_read_available()< NUM_SAMPLES: sleep(0.01)
+        ## this sometimes generates input overflowed. So maybe just wrap it.
+        #audio_data  = frombuffer(_stream.read(
+             #_stream.get_read_available()), dtype=short)[-NUM_SAMPLES:]
+    #except:
+        #print('Input overflowed, so continue. (probably)')
+        ## TODO: once input overflows it doesn't clear itself. So what next? this doesn't work reliably
+        #continue
     
     # Each data point is a signed 16 bit number, so we can normalize by dividing 32*1024
     normalized_data = audio_data / 32768.0
