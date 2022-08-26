@@ -1,6 +1,4 @@
-#PDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
-# SPDX-License-Identifier: MIT
-"""Arcade QT example that pulses the button LED on button press"""
+import pdb
 import time
 import board
 import digitalio
@@ -77,11 +75,12 @@ def dispense(num):
 
 flags=[0,0]
 
-print('Ready for buttons...')
+print('Ukranian Roulette is ready for buttons...')
 while True:
     for led_number, button in enumerate(buttons):
-        if led_number>1:
+        if led_number > 1:
             continue
+
         if not button.value:
             if flags[led_number] == 1:
                 #print('sorry already pressed')
@@ -93,3 +92,12 @@ while True:
                 x.start()
 
 
+# Copyright and other notices
+# The original button code started with the AdaFruit example. 
+# There is not much left of the original sample code, but props for
+# the starting point..
+# 
+# This is AdaFruit sample license
+#PDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: MIT
+"""Arcade QT example that pulses the button LED on button press"""
