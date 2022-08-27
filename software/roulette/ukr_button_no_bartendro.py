@@ -1,5 +1,5 @@
 import pdb
-import time
+from time import sleep
 import board
 import digitalio
 from adafruit_seesaw.seesaw import Seesaw
@@ -14,7 +14,18 @@ i2c = board.I2C()
 
 # Todo: This sometimes fails on start up
 # RuntimeError: Seesaw hardware ID returned (0xc3) is not correct! Expected 0x55 or 0x87. Please check your wiring.
-arcade_qt = Seesaw(i2c, addr=0x3A)
+
+cnt = 0
+while cnt < 5:
+    try:
+        arcade_qt = Seesaw(i2c, addr=0x3A)
+        cnt = 99
+    except:
+        cnt+=1
+        print('Seesaw hardware error...waiting to try again. cnt: ', cnt) 
+        sleep(2)
+        pass
+
 
 # initialize buttons[] and leds[]
 # Button pins in order (1, 2, 3, 4)
@@ -33,46 +44,55 @@ for led_pin in led_pins:
     led = PWMOut(arcade_qt, led_pin)
     leds.append(led)
 
+try:
+    from adafruit_motorkit import MotorKit
+    emulation=0
+except:
+    # no motorkit
+    emulation=1 
 
-def dispense(num):
-    print('start dispense: ', num)
+from ukr_lib import Ukr as Ukr    
+ukr = Ukr(emulation=0,  ukr_max_drink=6, ukr_bad=0, ukr_drink_counter=0)
+
+def dispense(num, ukr):
+    print("Start Dispense button: %i" % (num))
     leds[num].duty_cycle = 65535
-    #time.sleep(3)
-    # todo: get bartendro up
-    # todo: set the url of local bartendero, maybe to hostname? 
     # todo: does urllib block? yes. So it is perfect
+
     # todo: need to determine the pump.
     # my 1,3,5,7 maps to dispensers 0,2,4,6
     # 0,2 - good stuff
     # 4,6 - You never expect the Malort
     # map 0 and 1 to good and bad
- 
-    good = 0 + 2*num 
-    bad = 4 + 2*num
 
+    # which pump should we use? 
+    good = num 
+    bad = 2+num
     pump = good
-    # the url is: 
-    # /dispenser/size in ml
-    # if button 0 is pushed, and then button 1, then  it appears
-    # that the right pump turns off prematurely when the left pump turns off.
-    # the led waits, but the pump stops.
-    # this mush be in bartendro.
-    apicall="http://ukr.local:8080//ws/dispense/%i/12" % pump
-    print('calling: ', apicall)
-    try:
-        with urllib.request.urlopen(apicall) as response:
-            rslt  = response.read()
-            print('bartendro returned: ', rslt)
-            time.sleep(2)
-    except urllib.error.URLError:
-        print('URLError trying to pour the shot. Is Bartendro running? num=', num)
+
+    flag= ukr.ukr_next_drink()
+    if flag:
+        print("\tdispensing to pump %i drink counter: %i bad drink: %i" % (pump, ukr.ukr_drink_counter, ukr.ukr_bad))
+        print('\tdispensing to pump %i You get to go to space. Congratulations' % pump)
+        pump=good
+    else:
+        print('\tdispensing to pump %i You are NOT going to space today' % pump)
+        pump=bad
+
+    # TODO: move this somewhere reasonable
+    ml = 20 # how big is the shot?
+    SECONDS_PER_ML = 18/100. # huh?
+    delay = ml*SECONDS_PER_ML
+
+    # dispense our shot...
+    ukr.m[pump].throttle=-1
+    sleep(delay)
+    ukr.m[pump].throttle=0
 
     leds[num].duty_cycle = 0 
-    print('end dispense: ', num)
+    print('\tend dispense: ', num)
     flags[num]=0
-        
-    
-
+       
 flags=[0,0]
 
 if __name__ == '__main__':
@@ -89,7 +109,8 @@ if __name__ == '__main__':
                 else:
                     flags[led_number] = 1
                     #print("Button pressed %i: value: %r" % (led_number, button.value))
-                    x = Thread(target=dispense, args=(led_number,))
+                    x = Thread(target=dispense, args=(led_number,ukr))
+                    #x = Thread(target=dispense, args=(led_number,ukr))
                     x.start()
 
 
