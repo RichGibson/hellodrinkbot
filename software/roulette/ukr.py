@@ -57,11 +57,12 @@ def blink(foo):
     '''blink leds until stopped. Why? '''
     while True:
         if event.is_set():
-            break
+            sleep(1)
+            continue
         for num in (0,1):
-            leds[num].duty_cycle = 65535
-            sleep(.25)
             leds[num].duty_cycle = 0 
+            sleep(.25)
+            leds[num].duty_cycle = 65535
             sleep(.25)
 
 event = Event()
@@ -69,6 +70,7 @@ ledthread = Thread(target=blink, args=(0,))
 ledthread.start()
 
 def dispense(num, ukr):
+    # whoops, race condition
     event.set()
     print("Start Dispense button: %i" % (num))
     leds[num].duty_cycle = 65535
@@ -107,7 +109,8 @@ def dispense(num, ukr):
     leds[num].duty_cycle = 0 
     print('\tend dispense: ', num)
     flags[num]=0
-    # I want to restart ledthread, but I don't know how yet
+    # I want to restart ledthread
+    event.clear()
        
 flags=[0,0]
 
