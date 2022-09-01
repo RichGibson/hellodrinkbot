@@ -1,237 +1,148 @@
-# Ukrainian Roulette
-
-import sys
-import random
-import atexit
 import pdb
-import readchar
-import time
-import threading
-from adafruit_motorkit import MotorKit
+from time import sleep
+import board
+import digitalio
+from adafruit_seesaw.seesaw import Seesaw
+from adafruit_seesaw.digitalio import DigitalIO
+from adafruit_seesaw.pwmout import PWMOut
 
-emulation=0
-max_drink_counter=6 # one bad drink in each group of six
-bad = 0
-drink_counter = 0
+from threading import Thread, Event
+import urllib.request
 
+# For most boards.
+i2c = board.I2C()
 
-left_button=5
-right_button=6
-
-#####
-
-mh1 = MotorKit()
-
-def turnOffMotors():
-    mh1.motor1.throttle = None
-    mh1.motor2.throttle = None
-    mh1.motor3.throttle = None
-    mh1.motor4.throttle = None
+# Todo: This sometimes fails on start up so just try again
+# RuntimeError: Seesaw hardware ID returned (0xc3) is not correct! Expected 0x55 or 0x87. Please check your wiring.
+cnt = 0
+while cnt < 5:
     try:
-        mh2.motor1.throttle = None
-        mh2.motor2.throttle = None
-        mh2.motor3.throttle = None
-        mh2.motor4.throttle = None
+        arcade_qt = Seesaw(i2c, addr=0x3A)
+        cnt = 99
     except:
+        cnt+=1
+        print('Seesaw hardware error...waiting to try again. cnt: ', cnt) 
+        sleep(2)
         pass
 
-atexit.register(turnOffMotors)
 
-def dispense(button):
-    """ dispense for a player
-    player 1 is pumps 1 and 3
-    player 2 is pumps 5 and 7
+# initialize buttons[] and leds[]
+# Button pins in order (1, 2, 3, 4)
+button_pins = (18, 19, 20, 2)
+buttons = []
+for button_pin in button_pins:
+    button = DigitalIO(arcade_qt, button_pin)
+    button.direction = digitalio.Direction.INPUT
+    button.pull = digitalio.Pull.UP
+    buttons.append(button)
 
-    player 1 - Motor 1 forward good stuff
-    player 1 - Motor 2 forward bad stuff
-    player 2 - Motor 3 forward good stuff
-    player 2 - Motor 4 forward bad stuff
-    """
-    print('dispense button: ', button)
-    if button==left_button:
-        key='1'
-        player=1
-    else:
-        key='2'
-        player=2
-
-    global drink_counter
-    global bad
-    # 1 = left player
-    # 2 = right player
-
-    # get drink number and bad number
-    next_drink()
-
-    print('Dispense player=%i drink_counter=%i bad=%i ' % (player,drink_counter, bad), end='')
-    if drink_counter==bad:
-        # serve the icky drink
-        # reset drink_counter and bad. Or should I? One bad out of six shots
-        # 0 1 0 1
-        # motors  1,2,3,4
-        # left = 1 right=2
-        # if bad it is 2 or 4
-        # good = 1, 3
-        # bad  = 2, 4
-        #bad = player+1
-       
-         
-        if player==1:
-            pump =2
-        if player==2:
-            pump = 4
-
-        print('\n\tpump %i You are NOT going to space today' % pump)
-        m[pump].throttle = -1
-        time.sleep(t)
-        m[pump].throttle = None 
-
-        drink_counter=0
-        bad=0
-    else:
-        # serve a fine shot
-        # player = 1 or 2
-        # pump = 1 or 3 
-        # how do I deal with my sense of cognitive decline. A little machine which 
-        # takes player and bad/good and maps it to a pump. Should be easier than I make it.
-        if player==1:
-            pump = 1
-        if player==2:
-            pump = 3
-
-        print('\n\tpump %i You get to go to space. Congratulations' % pump)
-        m[pump].throttle = -1
-        time.sleep(sleep_time)
-        m[pump].throttle = None
-
-    print('service complete for %s \n' % key)
-
-# recommended for auto-disabling motors on shutdown!
-def turnOffMotors():
-    try:
-        mh1.motor1.throttle = None 
-        mh1.motor2.throttle = None
-        mh1.motor3.throttle = None
-        mh1.motor4.throttle = None
-    except:
-        pass
-
-#atexit.register(turnOffMotors)
-
-################################# DC motor test!
-m = [None]
-try:
-    m.append(mh1.motor1)
-    m.append(mh1.motor2)
-    m.append(mh1.motor3)
-    m.append(mh1.motor4)
-except:
-    print("can't add motors")
-    sys.exit(2)
+# LED pins in order (1, 2, 3, 4)
+led_pins = (12, 13, 0, 1)
+leds = []
+for led_pin in led_pins:
+    led = PWMOut(arcade_qt, led_pin)
+    leds.append(led)
 
 try:
-    import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
-
-    # GPIO.setwarnings(False) # Ignore warning for now
-    GPIO.setwarnings(True) # Ignore warning for now
-    #GPIO.setmode(GPIO.BOARD) 
-    GPIO.setmode(GPIO.BCM)
-
-
-    # Set pins left_button and right_button input pins and set initial value to be pulled low (off)
-    GPIO.setup(left_button, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    GPIO.setup(right_button, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    GPIO.add_event_detect(left_button,GPIO.RISING,callback=dispense) # Setup event on rising edge
-    GPIO.add_event_detect(right_button,GPIO.RISING,callback=dispense) # Setup event on rising edge
-
+    from adafruit_motorkit import MotorKit
+    emulation=0
 except:
-    print('Raspberry pi not responding, continuing in emulation mode')
-    emulation=1
+    # no motorkit
+    emulation=1 
 
-def next_drink():
-    """ increment the counter and if need be select the next bad shot"""
-    global drink_counter
-    global bad
-    if bad == 0:
-        bad = random.randrange(6)+1
-    drink_counter += 1
-    if drink_counter > max_drink_counter:
-        drink_counter=1
-        bad = random.randrange(6)+1
+from ukr_lib import Ukr as Ukr    
+ukr = Ukr(emulation=0,  ukr_max_drink=6, ukr_bad=0, ukr_drink_counter=0)
 
-    return
+def blink(foo):
+    '''blink leds until stopped. Why? '''
+    while True:
+        if event.is_set():
+            break
+        for num in (0,1):
+            leds[num].duty_cycle = 65535
+            sleep(.25)
+            leds[num].duty_cycle = 0 
+            sleep(.25)
 
+event = Event()
+ledthread = Thread(target=blink, args=(0,))
+ledthread.start()
 
+def dispense(num, ukr):
+    event.set()
+    print("Start Dispense button: %i" % (num))
+    leds[num].duty_cycle = 65535
+    # todo: does urllib block? yes. So it is perfect
 
-sleep_time=2
-def dispense(button):
-    """ dispense for a player
-    player 1 is pumps 1 and 3
-    player 2 is pumps 5 and 7
+    # todo: need to determine the pump.
+    # my 1,3,5,7 maps to dispensers 0,2,4,6
+    # 0,2 - good stuff
+    # 4,6 - You never expect the Malort
+    # map 0 and 1 to good and bad
 
-    player 1 - Motor 1 forward good stuff
-    player 1 - Motor 2 forward bad stuff
-    player 2 - Motor 3 forward good stuff
-    player 2 - Motor 4 forward bad stuff
-    """
-    print('dispense button: ', button)
-    if button==left_button:
-        key='1'
-        player=1
+    # which pump should we use? 
+    good = num 
+    bad = 2+num
+    pump = good
+
+    flag= ukr.ukr_next_drink()
+    if flag:
+        print("\tdispensing to pump %i drink counter: %i bad drink: %i" % (pump, ukr.ukr_drink_counter, ukr.ukr_bad))
+        print('\tdispensing to pump %i You get to go to space. Congratulations' % pump)
+        pump=good
     else:
-        key='2'
-        player=2
+        print('\tdispensing to pump %i You are NOT going to space today' % pump)
+        pump=bad
 
-    global drink_counter
-    global bad
-    # 1 = left player
-    # 2 = right player
+    # TODO: move this somewhere reasonable
+    ml = 20 # how big is the shot?
+    SECONDS_PER_ML = 18/100. # huh?
+    delay = ml*SECONDS_PER_ML
 
-    # get drink number and bad number
-    next_drink()
+    # dispense our shot...
+    ukr.m[pump].throttle=-1
+    sleep(delay)
+    ukr.m[pump].throttle=0
 
-    print('Dispense player=%i drink_counter=%i bad=%i ' % (player,drink_counter, bad), end='')
-    if drink_counter==bad:
-        # serve the icky drink
-        # reset drink_counter and bad. Or should I? One bad out of six shots
-        # 0 1 0 1
-        # motors  1,2,3,4
-        # left = 1 right=2
-        # if bad it is 2 or 4
-        # good = 1, 3
-        # bad  = 2, 4
-        #bad = player+1
+    leds[num].duty_cycle = 0 
+    print('\tend dispense: ', num)
+    flags[num]=0
+    # I want to restart ledthread, but I don't know how yet
        
-         
-        if player==1:
-            pump =2
-        if player==2:
-            pump = 4
+flags=[0,0]
 
-        print('\n\tpump %i You are NOT going to space today' % pump)
-        m[pump].throttle = -1
-        m[pump].throttle = None 
-        time.sleep(sleep_time)
-        drink_counter=0
-        bad=0
-    else:
-        # serve a fine shot
-        # player = 1 or 2
-        # pump = 1 or 3 
-        # how do I deal with my sense of cognitive decline. A little machine which 
-        # takes player and bad/good and maps it to a pump. Should be easier than I make it.
-        if player==1:
-            pump = 1
-        if player==2:
-            pump = 3
 
-        print('\n\tpump %i You get to go to space. Congratulations' % pump)
-        m[pump].throttle = -1
-        time.sleep(sleep_time)
-        m[pump].throttle = None
 
-    print('service complete for %s \n' % key)
+first_pour=True
+if __name__ == '__main__':
+    print('Ukranian Roulette is ready for buttons...')
+    while True:
+        for led_number, button in enumerate(buttons):
+            if led_number > 1:
+                continue
 
-print("Waiting for a button or enter")
-message = input("Press enter to quit\n\n") # Run until someone presses enter
-GPIO.cleanup()
+            if not button.value:
+                if first_pour:
+                    #ledthread.stop()
+                    first_pour=False
+
+                if flags[led_number] == 1:
+                    #print('sorry already pressed')
+                    pass
+                else:
+                    flags[led_number] = 1
+                    #print("Button pressed %i: value: %r" % (led_number, button.value))
+                    x = Thread(target=dispense, args=(led_number,ukr))
+                    #x = Thread(target=dispense, args=(led_number,ukr))
+                    x.start()
+
+
+# Copyright and other notices
+# The original button code started with the AdaFruit example. 
+# There is not much left of the original sample code, but props for
+# the starting point..
+# 
+# This is AdaFruit sample license
+#PDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
+# SPDX-License-Identifier: MIT
+"""Arcade QT example that pulses the button LED on button press"""

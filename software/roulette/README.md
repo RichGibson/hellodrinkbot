@@ -1,6 +1,22 @@
 # Ukrainian Roulette
 
-Aug 26, 2022
+## Installation
+
+    $ sudo su 
+    $ pip install -r requirements.txt
+    $ sudo crontab -e 
+
+    add: 
+
+    @reboot python /home/pi/hellodrinkbot/software/roulette/ukr.py
+
+
+
+## Aug 30, 2022
+
+Christine and I served drinks from it and everything worked. Dang!
+
+## Aug 26, 2022
 
 Strip out the need for Bartendro. We have four pumps, we don't need all 
 of that code. Especially since I don't understand it.
