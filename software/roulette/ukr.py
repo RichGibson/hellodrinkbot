@@ -53,6 +53,10 @@ except:
 from ukr_lib import Ukr as Ukr    
 ukr = Ukr(emulation=0,  ukr_max_drink=6, ukr_bad=0, ukr_drink_counter=0)
 
+# Todo: want to turn off the light of a dispenser that is not dispensing
+# there is a race condition, which is why in this loop I turn the led off
+# and then on, so when it is interrupted it doesn't interfere with dispense()
+# turning the light on.
 def blink(foo):
     '''blink leds until stopped. Why? '''
     while True:
