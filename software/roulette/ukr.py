@@ -102,6 +102,7 @@ def dispense(num, ukr):
 
     # TODO: move this somewhere reasonable
     ml = 20 # how big is the shot?
+    # actually pouring about 6ml. Hmmm.
     SECONDS_PER_ML = 18/100. # huh?
     delay = ml*SECONDS_PER_ML
 
