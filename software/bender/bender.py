@@ -1,9 +1,8 @@
 # Martini or fuck you.
 
-# Todo: currently allows double dispensing, a gin and vodka martini
-# can be served at the same time, ala ukranian roulette.
-# I need to either make two dispensers in Bender, or change this code to
-# only dispense one martini at a time.
+# Todo: 
+# - play bite my shiny metal ass if you pick the 'fuck you' button
+# - hook pump or two pumps up to pour martini if you press the martini button
 
 import pdb
 from time import sleep
