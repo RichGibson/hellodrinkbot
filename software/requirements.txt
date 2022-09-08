@@ -35,7 +35,7 @@ docutils==0.16
 drumhat==0.1.0
 envirophat==1.0.0
 ExplorerHAT==0.4.2
-Flask==0.10.1
+Flask>=1.0.0
 Flask-Login==0.3.2
 Flask-SQLAlchemy==2.5.1
 fourletterphat==0.1.0
@@ -48,7 +48,7 @@ jedi==0.18.0
 Jinja2==2.11.3
 lazy-object-proxy==0.0.0
 logilab-common==1.8.1
-lxml==4.6.3
+lxml>=4.9.1
 MarkupSafe==1.1.1
 mccabe==0.6.1
 microdotphat==0.2.1
@@ -56,7 +56,7 @@ mote==0.0.4
 motephat==0.0.3
 mypy==0.812
 mypy-extensions==0.4.3
-numpy==1.19.5
+numpy>=1.22
 oauthlib==3.1.0
 olefile==0.46
 pantilthat==0.0.7
@@ -68,16 +68,17 @@ pianohat==0.1.0
 picamera==1.13
 piglow==1.2.5
 pigpio==1.78
-Pillow==8.1.2
+Pillow>=9.0.1
 psutil==5.8.0
 pycairo==1.16.2
 pycups==2.0.1
 pyftdi==0.54.0
 pygame==1.9.6
-Pygments==2.7.1
+Pygments>=2.7.4
 PyGObject==3.38.0
 pyinotify==0.9.6
-PyJWT==1.7.1
+# I don't think I need a lot of the things in here.
+#PyJWT>=2.4.0
 pylint==2.7.2
 pyOpenSSL==20.0.1
 pyserial==3.5b0
