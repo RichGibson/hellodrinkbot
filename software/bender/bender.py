@@ -5,12 +5,15 @@
 # - hook pump or two pumps up to pour martini if you press the martini button
 
 import pdb
+import vlc
+import os
 from time import sleep
 import board
 import digitalio
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.digitalio import DigitalIO
 from adafruit_seesaw.pwmout import PWMOut
+import random
 
 from threading import Thread, Event
 import urllib.request
@@ -30,6 +33,105 @@ while cnt < 5:
         print('Seesaw hardware error...waiting to try again. cnt: ', cnt) 
         sleep(2)
         pass
+
+
+bad_files = [
+        "file:////home/pi/hellodrinkbot/software/bender/sound/NOSE BLOW - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:////home/pi/hellodrinkbot/software/bender/sound/bite.mp3",
+    ]
+good_files = [
+        "file:////home/pi/hellodrinkbot/software/bender/sound/GOT IT - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:////home/pi/hellodrinkbot/software/bender/sound/HEY, HERE'S AN IDEA - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:///home/pi/hellodrinkbot/software/bender/sound/YOU GOT IT GENIUS - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:///home/pi/hellodrinkbot/software/bender/sound/THIS PLACE HAS CLASS - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:///home/pi/hellodrinkbot/software/bender/sound/THIS WILL TEACH THOSE FILTHY BASTARDS WHO'S LOVEABLE - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:///home/pi/hellodrinkbot/software/bender/sound/MAYBE IF YOU CLEAN UP FIRST - AUDIO FROM JAYUZUMI.COM.mp3",
+    ]
+
+
+
+Instance = vlc.Instance()
+
+def load_media(files):
+    media = []
+    # try preloading files
+    for file in files:
+        print ("\n\nLooking for:", file)
+        # Grab file extension
+        ext = (file.rpartition(".")[2])[:3]
+        found = False
+        # Test if url is a local file or remote
+        if file[:4] == 'file':
+            if os.path.isfile(file[7:]):
+                found = True
+            else:
+                print ('Error: File ', file[7:], ' Not found')
+                continue
+        else:
+            try:
+                r = requests.get(file, stream=True)
+                found = r.ok
+            except ConnectionError as e:
+                print('failed to get stream: {e}'.format(e=e))
+                continue
+        if found:
+            #Media = Instance.media_new(file)
+            media.append(Instance.media_new(file))
+            Media_list = Instance.media_list_new([file])
+            media[0].get_mrl()
+            player.set_media(media[0])
+    return media
+
+player = Instance.media_player_new()
+good_media = load_media(good_files)
+bad_media = load_media(bad_files)
+
+# So media is now a list, with the mp3 files listed in files[]
+# and we can do player.set_media(media[index]) and then play that.
+# so clean it up and ship it?
+# maybe good_media and bad_media
+
+
+def play_good():
+    # pick file from good_media list
+    x = random.randint(0,len(good_media)-1)
+    print('\twhat good media to play ', x)
+    media = good_media[x]
+    player.set_media(media)
+    if player.play() == -1:
+        print('error')
+    #print ('Sampling  for a few seconds')
+    #sleep(2)
+    #player.stop()
+
+def play_bad():
+    # pick file from bad_media list
+    x = random.randint(0,len(bad_media)-1)
+    print('\twhat bad media to play ', x)
+    media = bad_media[x]
+    player.set_media(media)
+    if player.play() == -1:
+        print('error')
+    #print ('Sampling  for a few seconds')
+    #sleep(2)
+    #player.stop()
+
+#=========================================================#
+
+#        #Use this code to play audio until it stops
+#        print ('Playing ', url, ' until it stops')
+#        time.sleep(5) #Give it time to get going
+#        while True:
+#            if ext in playlists:
+#                state = list_player.get_state()
+#                if state not in playing:
+#                    break
+#            else:
+#                state = player.get_state()
+#                if state not in playing:
+#                    break
+#=========================================================#
+
 
 
 # initialize buttons[] and leds[]
@@ -82,7 +184,7 @@ ledthread.start()
 def dispense(num, bender):
     # whoops, race condition
     event.set()
-    print("Start Dispense button: %i" % (num))
+    print("Start processing for button: %i" % (num))
     leds[num].duty_cycle = 65535
     # todo: does urllib block? yes. So it is perfect
 
@@ -93,21 +195,25 @@ def dispense(num, bender):
     # map 0 and 1 to good and bad
 
     # which pump should we use? 
-    gin = num 
-    bad = 2+num
-    pump = num
+    # for bender it is pump 1 or 'fuck you'
+    pump = 1
 
-    print('\tdispensing  a martini to pump %i ' % pump)
+    if num==0:
+        play_good()
+        print('\tdispensing  a martini to pump %i ' % pump)
 
-    # TODO: move this somewhere reasonable
-    ml = 10 # how big is the drink? 10 is tiny for testing.
-    SECONDS_PER_ML = 18/100. # huh?
-    delay = ml*SECONDS_PER_ML
+        # TODO: move this somewhere reasonable
+        ml = 10 # how big is the drink? 10 is tiny for testing.
+        SECONDS_PER_ML = 18/100. # huh?
+        delay = ml*SECONDS_PER_ML
 
-    # dispense our shot...
-    bender.m[pump].throttle=-1
-    sleep(delay)
-    bender.m[pump].throttle=0
+        # dispense our beverage...
+        bender.m[pump].throttle=-1
+        sleep(delay)
+        bender.m[pump].throttle=0
+    else:
+        play_bad()
+        print('No Martini!')
 
     leds[num].duty_cycle = 0 
     print('\tend dispense: ', num)
