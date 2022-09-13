@@ -5,6 +5,7 @@
 # - hook pump or two pumps up to pour martini if you press the martini button
 
 import pdb
+import sys
 import vlc
 import os
 from time import sleep
@@ -21,8 +22,11 @@ import urllib.request
 # For most boards.
 i2c = board.I2C()
 
-# Todo: This sometimes fails on start up so just try again
+# The Seesaw board fails on start up, so just retry up to five times.
+# The error I get:
 # RuntimeError: Seesaw hardware ID returned (0xc3) is not correct! Expected 0x55 or 0x87. Please check your wiring.
+
+print('Initializing Seesaw board')
 cnt = 0
 while cnt < 5:
     try:
@@ -30,15 +34,25 @@ while cnt < 5:
         cnt = 99
     except:
         cnt+=1
-        print('Seesaw hardware error...waiting to try again. cnt: ', cnt) 
+        print('\tSeesaw hardware error...waiting to try again. cnt: ', cnt) 
         sleep(2)
         pass
 
+# what is played when you press 'make it dirty'
 
+dirty_files = [
+        "file:////home/pi/hellodrinkbot/software/bender/sound/HERE COMES VIOLENCE - AUDIO FROM JAYUZUMI.COM.mp3",
+        "file:///home/pi/hellodrinkbot/software/bender/sound/YOU DON'T HEAR ME NOT COMPLAINING - AUDIO FROM JAYUZUMI.COM.mp3",
+
+    ]
+
+# what is played for the 'fuck you' button
 bad_files = [
         "file:////home/pi/hellodrinkbot/software/bender/sound/NOSE BLOW - AUDIO FROM JAYUZUMI.COM.mp3",
         "file:////home/pi/hellodrinkbot/software/bender/sound/bite.mp3",
     ]
+
+# nice things, supportive things, dialoque you get when you make the correct choice.
 good_files = [
         "file:////home/pi/hellodrinkbot/software/bender/sound/GOT IT - AUDIO FROM JAYUZUMI.COM.mp3",
         "file:////home/pi/hellodrinkbot/software/bender/sound/HEY, HERE'S AN IDEA - AUDIO FROM JAYUZUMI.COM.mp3",
@@ -50,13 +64,11 @@ good_files = [
 
 
 
-Instance = vlc.Instance()
 
 def load_media(files):
     media = []
     # try preloading files
     for file in files:
-        print ("\n\nLooking for:", file)
         # Grab file extension
         ext = (file.rpartition(".")[2])[:3]
         found = False
@@ -82,9 +94,12 @@ def load_media(files):
             player.set_media(media[0])
     return media
 
+Instance = vlc.Instance()
 player = Instance.media_player_new()
+print ("Loading audio files")
 good_media = load_media(good_files)
 bad_media = load_media(bad_files)
+dirty_media = load_media(dirty_files)
 
 # So media is now a list, with the mp3 files listed in files[]
 # and we can do player.set_media(media[index]) and then play that.
@@ -92,45 +107,14 @@ bad_media = load_media(bad_files)
 # maybe good_media and bad_media
 
 
-def play_good():
-    # pick file from good_media list
-    x = random.randint(0,len(good_media)-1)
-    print('\twhat good media to play ', x)
-    media = good_media[x]
+def play(name, lst):
+    # pick an audio file from the passed list and play it
+    x = random.randint(0,len(lst)-1)
+    print('\twhat %s media to play %i' % (name, x))
+    media = lst[x]
     player.set_media(media)
     if player.play() == -1:
-        print('error')
-    #print ('Sampling  for a few seconds')
-    #sleep(2)
-    #player.stop()
-
-def play_bad():
-    # pick file from bad_media list
-    x = random.randint(0,len(bad_media)-1)
-    print('\twhat bad media to play ', x)
-    media = bad_media[x]
-    player.set_media(media)
-    if player.play() == -1:
-        print('error')
-    #print ('Sampling  for a few seconds')
-    #sleep(2)
-    #player.stop()
-
-#=========================================================#
-
-#        #Use this code to play audio until it stops
-#        print ('Playing ', url, ' until it stops')
-#        time.sleep(5) #Give it time to get going
-#        while True:
-#            if ext in playlists:
-#                state = list_player.get_state()
-#                if state not in playing:
-#                    break
-#            else:
-#                state = player.get_state()
-#                if state not in playing:
-#                    break
-#=========================================================#
+        print('error playing %s',name)
 
 
 
@@ -172,10 +156,12 @@ def blink(foo):
             sleep(1)
             continue
         for num in (0,1):
+            sleep(.4)
             leds[num].duty_cycle = 0 
-            sleep(.25)
+            leds[num+2].duty_cycle = 0 
+            sleep(.4)
             leds[num].duty_cycle = 65535
-            sleep(.25)
+            leds[num+2].duty_cycle = 65535 
 
 event = Event()
 ledthread = Thread(target=blink, args=(0,))
@@ -184,7 +170,7 @@ ledthread.start()
 def dispense(num, bender):
     # whoops, race condition
     event.set()
-    print("Start processing for button: %i" % (num))
+    print('\tstart dispense: ', num)
     leds[num].duty_cycle = 65535
     # todo: does urllib block? yes. So it is perfect
 
@@ -196,10 +182,10 @@ def dispense(num, bender):
 
     # which pump should we use? 
     # for bender it is pump 1 or 'fuck you'
-    pump = 1
 
     if num==0:
-        play_good()
+        pump = 1
+        play('good', good_media)
         print('\tdispensing  a martini to pump %i ' % pump)
 
         # TODO: move this somewhere reasonable
@@ -211,9 +197,23 @@ def dispense(num, bender):
         bender.m[pump].throttle=-1
         sleep(delay)
         bender.m[pump].throttle=0
-    else:
-        play_bad()
-        print('No Martini!')
+    if num==1:
+        play('bad', bad_media)
+        print('\tNo Martini!')
+    if num==2:
+        pump = 3
+        play('dirty', dirty_media)
+        print('\tdispensing  some olive juice pump %i ' % pump)
+
+        # TODO: move this somewhere reasonable
+        ml = 10 # how big is the drink? 10 is tiny for testing.
+        SECONDS_PER_ML = 18/100. # huh?
+        delay = ml*SECONDS_PER_ML
+
+        # dispense our beverage...
+        bender.m[pump].throttle=-1
+        sleep(delay)
+        bender.m[pump].throttle=0
 
     leds[num].duty_cycle = 0 
     print('\tend dispense: ', num)
@@ -221,40 +221,32 @@ def dispense(num, bender):
     # I want to restart ledthread
     event.clear()
        
-flags=[0,0]
+flags=[0,0,0]
 
 
 
 first_pour=True
 if __name__ == '__main__':
     print('Bender is ready for buttons...')
+
     while True:
         for led_number, button in enumerate(buttons):
-            if led_number > 1:
+            if led_number > 2:
                 continue
-
             if not button.value:
                 if first_pour:
                     #ledthread.stop()
                     first_pour=False
 
+                # had two buttons, now have three.
+                #print(led_number, button)
                 if flags[led_number] == 1:
                     #print('sorry already pressed')
                     pass
                 else:
                     flags[led_number] = 1
-                    #print("Button pressed %i: value: %r" % (led_number, button.value))
+                    print("Button pressed %i: value: %r" % (led_number, button.value))
                     x = Thread(target=dispense, args=(led_number,bender))
-                    #x = Thread(target=dispense, args=(led_number,bender))
                     x.start()
 
 
-# Copyright and other notices
-# The original button code started with the AdaFruit example. 
-# There is not much left of the original sample code, but props for
-# the starting point..
-# 
-# This is AdaFruit sample license
-#PDX-FileCopyrightText: 2022 Kattni Rembor for Adafruit Industries
-# SPDX-License-Identifier: MIT
-"""Arcade QT example that pulses the button LED on button press"""

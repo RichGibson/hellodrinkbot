@@ -37,13 +37,13 @@ for led_pin in led_pins:
 
 while True:
     for led_number, button in enumerate(buttons):
+        time.sleep(0.1)
         print("%i: value: %r" % (led_number, button.value))
         if not button.value:
             leds[led_number].duty_cycle = 65535
             time.sleep(0.5)
             leds[led_number].duty_cycle = 0
 
-if 0:
             for cycle in range(0, 65535, 8000):
                 leds[led_number].duty_cycle = cycle
                 time.sleep(delay)
