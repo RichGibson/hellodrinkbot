@@ -25,26 +25,29 @@ the documents)
 ## Next Steps
 
 ### Electronics
-- mount 3rd switch and wiring. Slightly harder because the 3rd button is installed on the front plate
-- mount 2 pumps, towards sides to provide room for head mounting options
-- mount pi and button board and connect to motors and buttons
-- mount leds. They are going to be obscured a bit by the arms. Drill hole, it gets too hot for hot glue.
-- pi and pump power
-- speaker in the head. Can cut off the base of the speakers
+1 mount 3rd switch and wiring. Slightly harder because the 3rd button is installed on the front plate
+1 mount 2 pumps, towards sides to provide room for head mounting options
+1 mount pi and button board and connect to motors and buttons
+1 mount leds. They are going to be obscured a bit by the arms. Drill hole, it gets too hot for hot glue.
+1 pi and pump power
+1 speaker in the head. Can cut off the base of the speakers
 
 ### Case
-- glue top and sides of case
-- close up the button box
-- mount dispenser holder and tubing
+1 glue top and sides of case
+1 close up the button box
+1 mount dispenser holder and tubing
+1 cover pump holes
 
-- Cover where arms enter body?
-- do the arms need to come off for packing? If so need to do things a bit different.
+1 Cover where arms enter body?
+1 do the arms need to come off for packing? If so need to do things a bit different.
 
-- Figure out head mounting
+1 Figure out head mounting
 
 
-- Make it dirty label
-- (Christine) finish the body. I think the Mouth is the big remaining issue. 
+1 Make it dirty label
+1 (Christine) finish the body. I think the Mouth is the big remaining issue. 
+
+1 document all of hte wires and controllers
 
 ### Final!
 
