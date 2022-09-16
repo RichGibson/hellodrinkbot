@@ -1,4 +1,4 @@
-# Simple Svelte Quiz App
+# Simple Svelte Quiz App - original code by Jason Lutterloh
 
 This is a simple Svelte quiz application. Given a JSON trivia document of questions & answers, you can very easily create a quiz web application.
 
