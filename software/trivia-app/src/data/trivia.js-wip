@@ -1,0 +1,22 @@
+export const trivia = {
+  title: "The Dude Imbibes!",
+  questions:
+  [
+    {
+      q: "What will not stand?",
+      a: ["This aggression", "Spilling my beverage", "Stone"],
+      img: "img/2-the-dude.jpg",
+      extratext: "This aggression will not stand, man. This sets our time period to after Aug 6th, 1990 when the quote that inspired this line was uttered by....",
+    },
+    {
+      q: "What brand of car did Magnum usually drive?",
+      a: ["Ferrari", "Aston Martin", "Jaguar"],
+      img: "img/big_lebowski_12.jpg",
+      followup: "To be specific, it was a Ferrari 308 GTS.",
+    },
+    {
+      q: "What are the names of Higgins' dogs?",
+      a: ["Zeus and Apollo", "Jupiter and Mars", "Hercules and Achilles"],
+    },
+  ]
+}
