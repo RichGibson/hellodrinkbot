@@ -4,7 +4,7 @@ import {trivia} from './trivia';
 
 // Settings
 export const maxNumberOfQuestions = readable(trivia.questions.length);
-export const numberOfQuestions = writable(10);
+export const numberOfQuestions = writable(5);
 
 // App State
 export const hasQuizBegun = writable(false);

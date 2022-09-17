@@ -112,9 +112,8 @@
   <div>
     Now you have choices!
     <ul>
-    <li><a href="http://127.0.0.1:8080/ws/drink/34?booze1=60&booze24=10&booze28=20&booze8=50">Pour me a White Ukranian/Caucasian</a></li>
-    <li><a href="">How about a Black Ukranian?</a></li>
-    <li><a href="">Let me see all of my drink choices</a></li>
+    <li><a href="http://127.0.0.1:8080/ws/drink/79?booze1=15&booze12=10&booze40=15">Pour me a White Ukranian/Caucasian</a></li>
+    <li><a href="http://127.0.0.1:8080">Let me see all of my drink choices</a></li>
     </ul>
     <button type="button" on:click={reset}>Play Again</button>
   </div>

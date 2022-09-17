@@ -54,8 +54,8 @@
         color: #fff;
         cursor: pointer;
         position: relative;
-        font-size: 0.6em;
-        line-height: .8em;
+        font-size: 0.9em;
+        line-height: .9em;
         box-sizing: border-box;
         padding: 20px 20px 20px 64px;
         text-align: left;
@@ -145,7 +145,7 @@
         <tr>
         <td>
         {#if question.img !== 'img/'}
-        <img src="{question.img}" width="300"><br>
+        <img src="{question.img}" width="300" alt='a fucking thing'><br>
         {/if}
         {#if question.extratext !== undefined}
         {question.extratext}<hr>

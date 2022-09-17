@@ -6,7 +6,7 @@ export const trivia = {
       q: "What will not stand?",
       a: ["This aggression", "Spilling my beverage", "Bowling trophy"],
       img: "img/2-the-dude.jpg",
-      extratext: "This aggression will not stand, man. This sets our time period to after Aug 6th, 1990 when the quote that inspired this line was uttered by....",
+      followup: "This aggression will not stand, man. This sets our time period to after Aug 6th, 1990 when the quote that inspired this line was uttered by president Bush.",
     },
     {
       q: "What Bob Dylan song plays during the film's opening credits?",
@@ -16,7 +16,7 @@ export const trivia = {
     },
     {
       q: "What is the Dude's favorite drink?",
-      a: ["White Russian (aka Causasian)", "Gin and Tonic", "Old Fashioned", "Manhattan"],
+      a: ["White Russian (aka Caucasian)", "Gin and Tonic", "Old Fashioned", "Manhattan"],
       img: "img/dude_sam_elliot_white_russian.jpg",
       followup: "The dude drinks nine White Russians over the course of the film",
     },
@@ -125,30 +125,6 @@ export const trivia = {
     {
       q: "What Rolling Stones song covered by Townes Van Zandt plays in the final scene of the film?",
       a: ["Dead Flowers", "Country Honk", "You can't always get what you want", "Let it bleed"],
-      img: "img/",
-      followup: "",
-    },
-    {
-      q: "?",
-      a: ["", "", ""],
-      img: "img/",
-      followup: "",
-    },
-    {
-      q: "?",
-      a: ["", "", ""],
-      img: "img/",
-      followup: "",
-    },
-    {
-      q: "?",
-      a: ["", "", ""],
-      img: "img/",
-      followup: "",
-    },
-    {
-      q: "?",
-      a: ["", "", ""],
       img: "img/",
       followup: "",
     },
