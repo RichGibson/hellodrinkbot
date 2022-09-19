@@ -96,6 +96,8 @@ def load_media(files):
 
 Instance = vlc.Instance()
 player = Instance.media_player_new()
+player.audio_set_volume(200)
+
 print ("Loading audio files")
 good_media = load_media(good_files)
 bad_media = load_media(bad_files)
@@ -113,6 +115,7 @@ def play(name, lst):
     print('\twhat %s media to play %i' % (name, x))
     media = lst[x]
     player.set_media(media)
+    player.audio_set_volume(200)
     if player.play() == -1:
         print('error playing %s',name)
 
@@ -184,7 +187,7 @@ def dispense(num, bender):
     # for bender it is pump 1 or 'fuck you'
 
     if num==0:
-        pump = 1
+        pump = 0
         play('good', good_media)
         print('\tdispensing  a martini to pump %i ' % pump)
 
@@ -201,7 +204,7 @@ def dispense(num, bender):
         play('bad', bad_media)
         print('\tNo Martini!')
     if num==2:
-        pump = 3
+        pump = 1
         play('dirty', dirty_media)
         print('\tdispensing  some olive juice pump %i ' % pump)
 
@@ -224,6 +227,8 @@ def dispense(num, bender):
 flags=[0,0,0]
 
 
+# The case LED is on one of the extra motor ports
+bender.m[3].throttle=-1
 
 first_pour=True
 if __name__ == '__main__':
