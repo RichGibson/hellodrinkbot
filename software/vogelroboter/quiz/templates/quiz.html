@@ -2,19 +2,35 @@
 <!-- hide header and nav so the quiz is cleaner --> 
 {% block header %}
     <h1 class="center">
-        Vögelroboter
+        <a href="/">Vögelroboter
         {% block title %} {{ p.page_title }} {% endblock %}
+        </a>
     </h1>
 {% endblock %}
 
 {% block nav %} {% endblock %}
 {% block content %}
     <img src="/static/birds/{{p.bird.img}}" class="centerpad">
-    <ul class="centerpad">
-        {% for answer in p.answers %}
-            <li class="listpad"><a href="{{url_for('quiz')}}?answer={{answer}}&q={{p.q}}&qcnt={{p.qcnt}}">{{answer}}</a></li>
-        {% endfor %}
-    </ul>
+    <p class="centerpad" style="font-size:24px">{{p.question_number}}) Welcher Vogel ist das? </p>
+    <!-- {% if p.show_answer %}
+    {% else %}
+    {% endif %}
+    -->
+        <ul class="centerpad">
+            {% for answer in p.answers %}
+                <li class="listpad"><a href="{{url_for('quiz')}}/{{answer}}">{{answer}}</a></li>
+            {% endfor %}
+        </ul>
+        <p class="centerpad" style="font-size:24px">{{p.last_correct}}</p>
+        <!-- <a href="/quiz"><button type="button"> Nächster Vogel </button> </a> -->
+
+    <!--
+
+    <hr>
+    Debugging<br>
+    bird: {{p.bird.name}}<br>
+    last answer? {{p.last_answer}}<br>
+    -->
 {% endblock %}
 
 
