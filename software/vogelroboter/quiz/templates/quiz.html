@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+<!-- hide header and nav so the quiz is cleaner --> 
+{% block header %}
+    <h1 class="center">
+        Vögelroboter
+        {% block title %} {{ p.page_title }} {% endblock %}
+    </h1>
+{% endblock %}
+
+{% block nav %} {% endblock %}
+{% block content %}
+    <img src="/static/birds/{{p.bird.img}}" class="centerpad">
+    <ul class="centerpad">
+        {% for answer in p.answers %}
+            <li class="listpad"><a href="{{url_for('quiz')}}?answer={{answer}}&q={{p.q}}&qcnt={{p.qcnt}}">{{answer}}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+

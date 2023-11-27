@@ -7,6 +7,7 @@
 
 - The quiz is in app.py
    python -m flask run
+   flask run --host=0.0.0.0 --port=5001 --reload
 
 - in browser: http://127.0.0.1:5000
 
