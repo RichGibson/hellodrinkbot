@@ -2,6 +2,7 @@
 
 The bird quiz robot
 
+[See the quiz directory README.md to run the quiz](quiz/README.md)
 
 ## Electronics
 
