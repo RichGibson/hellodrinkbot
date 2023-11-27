@@ -4,6 +4,12 @@ The bird quiz robot
 
 [See the quiz directory README.md to run the quiz](quiz/README.md)
 
+## Next steps:
+
+- get current code running on a raspberry pi with two pumps
+- add dispensing liquids to the code.
+- package two pumps, power (5 and 12 volt), Raspberry Pi, and mounting screws
+
 ## Electronics
 
 - Raspberry pi

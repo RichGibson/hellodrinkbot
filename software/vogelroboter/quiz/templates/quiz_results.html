@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+<!-- hide header and nav so the quiz is cleaner --> 
+
+{% block content %}
+
+    <ul class="centerpad">
+        {% for answer in p.results %}
+            <li><img src="/static/birds/{{answer.img}}" class="centerpad">
+                    {% if answer.bird == answer.answer %}
+                        Richtig! Es ist ein {{answer.bird}}
+                    {% else %}
+                        Schade! Es ist ein {{answer.bird}} und deine Antwort war {{answer.answer}}
+                    {% endif %}
+                </li>
+                <hr>
+        {% endfor %}
+    </ul>
+    <a href="/quiz"><button type="button"> Spiel nochmal?</button> </a>
+    <!-- 
+    <hr>
+
+    Debugging<br>
+    {{p.results}}
+    -->
+{% endblock %}
+
+
